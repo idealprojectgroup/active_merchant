@@ -159,4 +159,8 @@ class RemoteStripeTest < Test::Unit::TestCase
     assert refund = @gateway.refund(@amount - 20, response.authorization, { :refund_fee_amount => 10 })
     assert_success refund
   end
+
+  def test_force_api_version
+    #
+  end
 end

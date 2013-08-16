@@ -3,6 +3,8 @@ require 'active_support/core_ext/hash/slice'
 module ActiveMerchant #:nodoc:
   module Billing #:nodoc:
     class StripeGateway < Gateway
+      API_VERSION = '2013-02-13'
+
       self.live_url = 'https://api.stripe.com/v1/'
 
       AVS_CODE_TRANSLATOR = {
@@ -32,6 +34,7 @@ module ActiveMerchant #:nodoc:
       def initialize(options = {})
         requires!(options, :login)
         @api_key = options[:login]
+        @api_version = options[:version]
         @fee_refund_api_key = options[:fee_refund_login]
         super
       end
@@ -239,12 +242,14 @@ module ActiveMerchant #:nodoc:
         })
 
         key = options[:key] || @api_key
+        version = options[:version] || @api_version
 
         {
           "Authorization" => "Basic " + Base64.encode64(key.to_s + ":").strip,
           "User-Agent" => "Stripe/v1 ActiveMerchantBindings/#{ActiveMerchant::VERSION}",
           "X-Stripe-Client-User-Agent" => @@ua,
-          "X-Stripe-Client-User-Metadata" => options[:meta].to_json
+          "X-Stripe-Client-User-Metadata" => options[:meta].to_json,
+          # "Stripe-Version" => version
         }
       end
 
