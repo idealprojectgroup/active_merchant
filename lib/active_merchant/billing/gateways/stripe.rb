@@ -3,7 +3,6 @@ require 'active_support/core_ext/hash/slice'
 module ActiveMerchant #:nodoc:
   module Billing #:nodoc:
     class StripeGateway < Gateway
-      API_VERSION = '2013-02-13'
 
       self.live_url = 'https://api.stripe.com/v1/'
 
@@ -242,15 +241,15 @@ module ActiveMerchant #:nodoc:
         })
 
         key = options[:key] || @api_key
-        version = options[:version] || @api_version
 
-        {
+        result = {
           "Authorization" => "Basic " + Base64.encode64(key.to_s + ":").strip,
           "User-Agent" => "Stripe/v1 ActiveMerchantBindings/#{ActiveMerchant::VERSION}",
           "X-Stripe-Client-User-Agent" => @@ua,
           "X-Stripe-Client-User-Metadata" => options[:meta].to_json,
-          # "Stripe-Version" => version
         }
+        result["Stripe-Version"] = @api_version if @api_version
+        result
       end
 
       def commit(method, url, parameters=nil, options = {})
